@@ -1,6 +1,4 @@
-node_modules/
-dist/
-out/
+node_modules
 npm-debug.log
 .npm
 .git
@@ -19,3 +17,5 @@ build
 .next
 .cache
 .turbo
+Thumbs.db
+desktop.ini
