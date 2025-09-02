@@ -9,7 +9,7 @@ WORKDIR /app
 COPY --from=pruner /app/out/json .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 # Copy turbo.json from original location instead
-COPY turbo.json ./turbo.json
+COPY ../../turbo.json ./turbo.json
 RUN npm install --frozen-lockfile
 
 FROM node:lts-alpine AS builder
