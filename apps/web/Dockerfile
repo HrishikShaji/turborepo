@@ -2,7 +2,7 @@ FROM node:lts-alpine AS pruner
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune --scope=turborepo-nestjs --docker
+RUN turbo prune --scope=web --docker
 
 FROM node:lts-alpine AS installer
 WORKDIR /app
@@ -13,6 +13,10 @@ COPY turbo.json ./turbo.json
 RUN npm install --frozen-lockfile
 
 FROM node:lts-alpine AS builder
+ARG TURBO_TEAM
+ENV TURBO_TEAM=$TURBO_TEAM
+ARG TURBO_TOKEN
+ENV TURBO_TOKEN=$TURBO_TOKEN
 WORKDIR /app
 COPY --from=installer /app/ .
 COPY --from=pruner /app/out/full .
@@ -22,4 +26,6 @@ FROM node:lts-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/ .
-CMD ["node","apps/turborepo-nestjs/dist/main"]
+WORKDIR /app/apps/web
+
+CMD ["npm","start"]
