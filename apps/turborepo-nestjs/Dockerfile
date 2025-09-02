@@ -2,7 +2,7 @@ FROM node:lts-alpine AS pruner
 WORKDIR /app
 RUN npm install -g turbo
 COPY . .
-RUN turbo prune --scope=web --docker
+RUN turbo prune --scope=turborepo-nestjs --docker
 
 FROM node:lts-alpine AS installer
 WORKDIR /app
@@ -26,6 +26,6 @@ FROM node:lts-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/ .
-WORKDIR /app/apps/web
+WORKDIR /app/apps/turborepo-nestjs
 
 CMD ["npm","start"]
