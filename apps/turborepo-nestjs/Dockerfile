@@ -6,10 +6,9 @@ RUN turbo prune --scope=turborepo-nestjs --docker
 
 FROM node:lts-alpine AS installer
 WORKDIR /app
-COPY --from=pruner /app/out/json .
+# Copy the pruned lockfile and package.json files
+COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/package-lock.json ./package-lock.json
-# Copy turbo.json from original location instead
-COPY --from=pruner /app/turbo.json ./turbo.json
 RUN npm install --frozen-lockfile
 
 FROM node:lts-alpine AS builder
@@ -18,14 +17,19 @@ ENV TURBO_TEAM=$TURBO_TEAM
 ARG TURBO_TOKEN
 ENV TURBO_TOKEN=$TURBO_TOKEN
 WORKDIR /app
+# Copy installed dependencies
 COPY --from=installer /app/ .
-COPY --from=pruner /app/out/full .
+# Copy the full source code
+COPY --from=pruner /app/out/full/ .
 RUN npm run build
 
 FROM node:lts-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=builder /app/ .
+# Copy the built application
+COPY --from=builder /app/apps/turborepo-nestjs/dist ./apps/turborepo-nestjs/dist
+COPY --from=builder /app/apps/turborepo-nestjs/package.json ./apps/turborepo-nestjs/package.json
+# Copy node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
 WORKDIR /app/apps/turborepo-nestjs
-
-CMD ["npm","start"]
+CMD ["npm", "run", "start:prod"]
