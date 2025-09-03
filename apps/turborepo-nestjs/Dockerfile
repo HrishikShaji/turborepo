@@ -24,7 +24,15 @@ RUN npm run build
 FROM node:lts-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
+
+# Copy the built NestJS app
 COPY --from=builder /app/apps/turborepo-nestjs/dist ./dist
 COPY --from=builder /app/apps/turborepo-nestjs/package.json ./package.json
+
+# Copy the built packages that your app depends on
+COPY --from=builder /app/packages ./packages
+
+# Copy node_modules (which includes the workspace links)
 COPY --from=builder /app/node_modules ./node_modules
+
 CMD ["npm", "run", "start:prod"]
