@@ -10,6 +10,7 @@ export class ProductsController {
 	createProduct(
 		@Body() createProductRequest: CreateProductRequest
 	) {
+		console.log("THIS RAN")
 		return this.productService.createProduct(createProductRequest)
 	}
 
