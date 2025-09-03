@@ -2,7 +2,7 @@ FROM node:lts-alpine AS pruner
 WORKDIR /app
 RUN npm install -g turbo
 # Copy from the monorepo root (two levels up)
-COPY ..
+COPY . .
 RUN turbo prune --scope=turborepo-nestjs --docker
 
 FROM node:lts-alpine AS installer
